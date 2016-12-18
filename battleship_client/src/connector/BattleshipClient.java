@@ -8,12 +8,12 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class BattleshipClient {
 
-	private static final int PORT = 8051;
-
-	private static final String hostname = "192.168.0.13"; // adapter au serveur
+	private static int PORT;
+	private static String hostname; // adapter au serveur
 
 	/**
 	 * public BattleshipClient() { PrintWriter out = null; BufferedReader
@@ -67,11 +67,14 @@ public class BattleshipClient {
     public static Socket socket = null;
     public static Thread t1;
     
-    public static void main(String[] args) {
+    public BattleshipClient(String ip1,String ip2,String ip3,String ip4, int port) {
+    	
+    	hostname=(ip1+"."+ip2+"."+ip3+"."+ip4);
+    	PORT=port;
 	    try {
-	        System.out.println("Demande de connexion");
-	        socket = new Socket("192.168.1.38",8051);
-	        System.out.println("Connexion établie avec le serveur, authentification :"); // Si le message s'affiche c'est que je suis connecté
+	        System.out.println("Demande de connexion à "+hostname+":"+port);
+	        socket = new Socket(hostname,PORT);
+	        System.out.println("Connexion établie avec le serveur, authentification :");
 	        t1 = new Thread(new Connexion(socket));
 	        t1.start();
 	    } catch (UnknownHostException e) {
