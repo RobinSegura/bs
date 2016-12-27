@@ -3,7 +3,7 @@ package connector;
 import java.io.*;
 import java.net.Socket;
 
-import view.ClientFrame;
+import view.GUI;
 
 
 
@@ -16,7 +16,7 @@ public class ServerReader extends Thread {
 	private static volatile ServerReader instance = null;
 	
 	/** The reference to container class. */
-	ClientFrame clfrm;
+	GUI clfrm;
 	
 	/** The object input stream. */
 	ObjectInputStream reader;
@@ -49,7 +49,7 @@ public class ServerReader extends Thread {
 		this.reader = reader;
 	}
 
-    public void setClfrm(ClientFrame clfrm) {
+    public void setClfrm(GUI clfrm) {
 		this.clfrm = clfrm;
 	}
 

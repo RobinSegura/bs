@@ -11,7 +11,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import connector.Connexion;
-import connector.Message;
+import connector.Communication;
 import connector.ServerReader;
 import engine.PlayerStatus;
 
@@ -22,15 +22,15 @@ import engine.PlayerStatus;
  * 
  * This class create client's window containing two grids with five ships.
  */
-public class ClientFrame extends JFrame implements Runnable {
+public class GUI extends JFrame implements Runnable {
 	
 	private Socket cSocket;
 	private Connexion cnx;
 	private ServerReader sReader;
 	private ObjectOutputStream out;
 	private PlayerStatus status;
-	private GameBoard player;
-	private GameBoard opponent;
+	private Tableau player;
+	private Tableau opponent;
 	private boolean isConnected;
 	private boolean playerWin;
 	private boolean gameOver;
@@ -45,7 +45,7 @@ public class ClientFrame extends JFrame implements Runnable {
 	private JButton btnPlay;
 	private JButton btnNewGame;
 	
-	public ClientFrame(Socket s, ObjectInputStream in, ObjectOutputStream out, Connexion cnx){
+	public GUI(Socket s, ObjectInputStream in, ObjectOutputStream out, Connexion cnx){
 		super("BattleShip");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,12 +56,12 @@ public class ClientFrame extends JFrame implements Runnable {
 		playerWin = false;
 		this.cnx = cnx;
 		
-		player = new GameBoard(this);
+		player = new Tableau(this);
 		player.setBackground(Color.LIGHT_GRAY);
 		player.setBounds(10, 150, 300, 300);
 		getContentPane().add(player);
 
-		opponent = new GameBoard(this);
+		opponent = new Tableau(this);
 		opponent.setBackground(Color.LIGHT_GRAY);
 		opponent.setBounds(320, 150, 300, 300);
 		getContentPane().add(opponent);
@@ -192,7 +192,7 @@ public class ClientFrame extends JFrame implements Runnable {
 		
 		//Send ship flags to server
 		//wait for ship flags to arrive
-		Message msg = new Message();
+		Communication msg = new Communication();
 		msg.setMessageType(PlayerStatus.READY);
 		msg.setShipPosition(getMyShipPosition());
 		msg.setShipLocation(getMyShipLocation());
@@ -222,7 +222,7 @@ public class ClientFrame extends JFrame implements Runnable {
 		lblShipLeft_1.setText("Ship Destroyed: " + opponent.getShipDestroyed());
 		
 		status = PlayerStatus.CONNECTED;
-		Message msg = new Message();
+		Communication msg = new Communication();
 		msg.setMessageType(PlayerStatus.CONNECTED);
 		sendMessage(msg);
 		
@@ -246,7 +246,7 @@ public class ClientFrame extends JFrame implements Runnable {
 	 */
 	public void messageReceived(Object message) {
 		// TODO Auto-generated method stub
-		Message srMsg = (Message) message;
+		Communication srMsg = (Communication) message;
 		updateClient(srMsg);
 		
 		//lblMessage.setText("Message received " + srMsg.getMessageType());
@@ -258,7 +258,7 @@ public class ClientFrame extends JFrame implements Runnable {
 	 *
 	 * @param srMsg the Message Object.
 	 */
-	private void updateClient(Message srMsg) {
+	private void updateClient(Communication srMsg) {
 		
 		switch(srMsg.getMessageType()){
 		case NOT_CONNECTED:
@@ -341,7 +341,7 @@ public class ClientFrame extends JFrame implements Runnable {
 	}
 	
 	public void opponentMouseHit(int row, int column, boolean flag, boolean sdflag){
-		Message msg = new Message();
+		Communication msg = new Communication();
 		msg.setMessageType(PlayerStatus.TURN);
 		msg.setRow(row);
 		msg.setColumn(column);
@@ -356,7 +356,7 @@ public class ClientFrame extends JFrame implements Runnable {
 	 *
 	 * @param msg the Message object to send.
 	 */
-	private void sendMessage(Message msg){
+	private void sendMessage(Communication msg){
 		try {
 			out.writeObject(msg);
 		} catch (IOException e) {

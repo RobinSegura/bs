@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import view.ClientFrame;
+import view.GUI;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -55,7 +55,7 @@ public class Connexion extends JFrame implements Runnable {
 			System.err.println("Le serveur ne répond plus ");
 			e.printStackTrace();
 		}
-		t = new Thread(new ClientFrame(socket, in, out, this));
+		t = new Thread(new GUI(socket, in, out, this));
 		t.start();
 	}
 }

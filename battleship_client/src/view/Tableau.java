@@ -17,7 +17,7 @@ import java.awt.Graphics2D;
 /**
  * The Class GameBoard. Made of grid of cells and ship panels.
  */
-public class GameBoard extends JLayeredPane{
+public class Tableau extends JLayeredPane{
 	
     /** The Constant WIDTH of the board. */
     public static final int WIDTH = 300;
@@ -29,13 +29,13 @@ public class GameBoard extends JLayeredPane{
     private static final Dimension PANE_SIZE = new Dimension(WIDTH, HEIGHT);
     
     /** The parent window frame. */
-    private ClientFrame cframe;
+    private GUI cframe;
     
 	/** The cell grid board. */
-	private GridBoard gridBoard;
+	private Grille gridBoard;
 	
 	/** The ship layout board. */
-	private ShipBoard shipBoard;
+	private Flotte shipBoard;
 	
 	/** The transparent layer flag. */
 	private boolean topRect;
@@ -51,16 +51,16 @@ public class GameBoard extends JLayeredPane{
 	 *
 	 * @param cf the parent window.
 	 */
-	public GameBoard(ClientFrame cf){
+	public Tableau(GUI cf){
 		cframe = cf;
 		
 		//GridBoard
-			gridBoard = new GridBoard(this);
+			gridBoard = new Grille(this);
 			gridBoard.setSize(PANE_SIZE);
 			//gridBoard.setBackground(Color.blue.darker());
 		
 		//ShipBoard
-			shipBoard = new ShipBoard(this);
+			shipBoard = new Flotte(this);
 			shipBoard.setSize(PANE_SIZE);
 			shipBoard.setOpaque(false);
 
@@ -81,7 +81,7 @@ public class GameBoard extends JLayeredPane{
 	 * @param s ship object
 	 * @return calculated ship bounds
 	 */
-	public Rectangle getShipBounds(Ship s) {
+	public Rectangle getShipBounds(Bateau s) {
 		//return position and width, height of ship lable to be draw.
 		
 		int width = 0,height = 0;
@@ -103,22 +103,22 @@ public class GameBoard extends JLayeredPane{
 	}
 	
 	private class MyMouseAdapter extends MouseAdapter {
-		private GameBoard gbm;
+		private Tableau gbm;
         private int dragLabelWidthDiv2;
         private int dragLabelHeightDiv2;
-        private Ship clickedShip = null;
+        private Bateau clickedShip = null;
         private Point dropCell;
         private Point safeCell;
 
-        public MyMouseAdapter(GameBoard gb){
+        public MyMouseAdapter(Tableau gb){
         	gbm = gb;
         	safeCell = new Point();
         }
         
         public void mouseClicked(MouseEvent me) {
-        	if(shipBoard.getComponentAt(me.getPoint()) instanceof Ship)
+        	if(shipBoard.getComponentAt(me.getPoint()) instanceof Bateau)
         	{
-	        	clickedShip = (Ship) shipBoard.getComponentAt(me.getPoint());
+	        	clickedShip = (Bateau) shipBoard.getComponentAt(me.getPoint());
 	        	safeCell.setLocation(clickedShip.getRow(),clickedShip.getColumn());
 	        	gridBoard.clearShipCell(clickedShip);
 	        	clickedShip.setHorizontal(!clickedShip.isHorizontal());
@@ -138,9 +138,9 @@ public class GameBoard extends JLayeredPane{
         
         public void mousePressed(MouseEvent me) {
         	
-        	if(shipBoard.getComponentAt(me.getPoint()) instanceof Ship)
+        	if(shipBoard.getComponentAt(me.getPoint()) instanceof Bateau)
         	{
-	        	clickedShip = (Ship) shipBoard.getComponentAt(me.getPoint());
+	        	clickedShip = (Bateau) shipBoard.getComponentAt(me.getPoint());
 	        	safeCell.setLocation(clickedShip.getRow(),clickedShip.getColumn());
 	        	
                 dragLabelWidthDiv2 = 15 - 4;
@@ -254,7 +254,7 @@ public class GameBoard extends JLayeredPane{
 	}
 	
 	public boolean setShipHitById(int shipId){
-		if(shipBoard.setShipHitById(shipId)){
+		if(shipBoard.setToucheById(shipId)){
 			System.out.println("Ship id:" + shipId + " Destroyed.");
 			shipDestroyed++;
 			shipBoard.showShip(shipId);

@@ -7,10 +7,10 @@ import javax.swing.JLabel;
 /**
  * The Class Ship.
  */
-public class Ship extends JLabel{
+public class Bateau extends JLabel{
 
 	/** The parent ship board. */
-	private ShipBoard shipBoard;
+	private Flotte shipBoard;
 	
 	/** The id of the ship */
 	private int id;
@@ -41,7 +41,7 @@ public class Ship extends JLabel{
 	 * @param row the start row of the ship.
 	 * @param column the start column of the ship.
 	 */
-	public Ship(ShipBoard sb, int id,int length,int row, int column){
+	public Bateau(Flotte sb, int id,int length,int row, int column){
 		//super("Ship");
 		this.shipBoard = sb;
 		this.id = id;

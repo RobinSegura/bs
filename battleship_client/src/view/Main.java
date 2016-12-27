@@ -18,7 +18,7 @@ import com.sun.javafx.font.Disposer;
 
 import connector.Tester;
 
-public class StartFrame {
+public class Main {
 	public static void main(String[] args) throws Exception {
 		JFrame frame = new JFrame("Start");
 		frame.setLayout(null);

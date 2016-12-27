@@ -1,4 +1,4 @@
-package view;
+ package view;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -12,35 +12,16 @@ import javax.swing.border.LineBorder;
  * The Class Cell.
  *  * Class to create cell inside grid of game board.
  */
-public class Cell extends JPanel {
+public class Case extends JPanel {
 
-	// Indicate the row and column of this cell in the board
-    /** The row. */
 	private int row;
-    
-    /** The column. */
     private int column;
-	
-	/** The is mouse on. */
 	private int isMouseOn;
-    // Token used for this cell
-    /** The ship hit. */
-    private int shipHit; //0-nohit 1-noshiphit 2-shiphit
-
-    /** The grid board. */
-    private GridBoard gridBoard;
-    
-    /** The cell mouse listener. */
+    private int shipHit; 
+    private Grille gridBoard;
     private ClickListener cellMouseListener;
 
-    /**
-     * Creates a new cell.
-     *
-     * @param row set row number of the cell.
-     * @param column set column number of the cell.
-     * @param gui reference to the parent.
-     */
-    public Cell(int row, int column, GridBoard gui) {
+    public Case(int row, int column, Grille gui) {
 
       this.row = row;
       this.column = column;
@@ -51,70 +32,42 @@ public class Cell extends JPanel {
       this.setMinimumSize(new Dimension(30, 30));
       this.setMaximumSize(new Dimension(30, 30));
       
-      setBorder(new LineBorder(Color.cyan.darker(), 1));   // Set cell's border
-      
+      setBorder(new LineBorder(Color.cyan.darker(), 1)); 
+
       cellMouseListener = new ClickListener();
-      //addMouseListener(new ClickListener());       // Register listener
     }
-    
-    /**
-     * Enable mouse events for this cell.
-     */
+
 	public void enableCellMouseEvents(){
 			this.addMouseListener(cellMouseListener);
 	}
 	
-	/**
-	 * disable mouse events for this cell.
-	 */
 	public void disableCellMouseEvents(){
 			this.removeMouseListener(cellMouseListener);
 	}
     
-    /**
-     * Gets the row of cell.
-     *
-     * @return the row number of the cell.
-     */
     public int getRow() {
 		return row;
 	}
 
-	/**
-	 * Gets the column of this cell.
-	 *
-	 * @return the column number of the cell
-	 */
 	public int getColumn() {
 		return column;
 	}
     
-	
-	/**
-	 * set cell background color.
-	 */
 	public void highLight(){
     	isMouseOn=1;
     	repaint();
     }
 
-	/**
-	 * reset cell background color.
-	 */
     public void resetHighlight(){
     	isMouseOn=0;
     	shipHit=0;
     	repaint();
     }
 
-	/**
-	 * repaint cell
-	 */
     protected void paintComponent(Graphics g) {
 
       super.paintComponent(g);
 
-      //Change Color of cell if mouse over and exit
       if(shipHit > 0){
     	  if(shipHit==1){
     	      g.setColor(Color.DARK_GRAY);
@@ -130,28 +83,18 @@ public class Cell extends JPanel {
           g.setColor(Color.lightGray);
           g.fillRect(0, 0, getWidth(), getHeight());    	  
       }
-
     }
     
-	/**
-	 * set flag if ship is hit
-	 */
-    public void setShipHit(){
+    public void setTouche(){
     	shipHit = 2;
     	repaint();
     }
     
-	/**
-	 * set flag if hit is missed
-	 */
-    public void setMissedHit(){
+    public void setManque(){
     	shipHit = 1;
     	repaint();    	
     }
-    
-	/**
-	 * Mouse handler class
-	 */
+
 	private class ClickListener extends MouseAdapter {
 
     	public void mouseClicked(MouseEvent e) {

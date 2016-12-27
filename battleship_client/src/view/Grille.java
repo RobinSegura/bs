@@ -8,13 +8,13 @@ import javax.swing.JPanel;
 /**
  * The Class GridBoard.
  */
-public class GridBoard extends JPanel{
+public class Grille extends JPanel{
 	
 	/** The parent game board. */
-	private GameBoard gameBoard;
+	private Tableau gameBoard;
 	
 	/** The array of cells. */
-	private Cell[][] cells =  new Cell[10][10];
+	private Case[][] cells =  new Case[10][10];
 	
 	/** The array of ship position and hit flags. */
 	private int[][][] flags = new int[10][10][2];
@@ -33,7 +33,7 @@ public class GridBoard extends JPanel{
   	 *
   	 * @param gb parent game board
   	 */
-  	public GridBoard(GameBoard gb){
+  	public Grille(Tableau gb){
 		
 		this.gameBoard = gb;
 		  
@@ -41,7 +41,7 @@ public class GridBoard extends JPanel{
 
 	    for (int i = 0; i < 10; i++)
 	      for (int j = 0; j < 10; j++){
-	        add(cells[i][j] = new Cell(i, j, this));
+	        add(cells[i][j] = new Case(i, j, this));
 	        
 	        flags[i][j][0] = 0; //isShip
 	        flags[i][j][1] = 0; //isHit
@@ -88,7 +88,7 @@ public class GridBoard extends JPanel{
 	 *
 	 * @param s the ship for which to set cells.
 	 */
-	public void setShipOccupiedCellFlag(Ship s){
+	public void setShipOccupiedCellFlag(Bateau s){
 		//set ship flags
 		
 		int rowStart = s.getRow(),colStart = s.getColumn();
@@ -123,7 +123,7 @@ public class GridBoard extends JPanel{
 	 *
 	 * @param s the ship object for which to clear cells.
 	 */
-	public void clearShipCell(Ship s){
+	public void clearShipCell(Bateau s){
 		
 		int rowStart = s.getRow(),colStart = s.getColumn();
 		int rowEnd =0,colEnd = 0;
@@ -152,11 +152,11 @@ public class GridBoard extends JPanel{
 	 * @param s the ship object
 	 * @return true, if is ships collide at specified location.
 	 */
-	public boolean isShipCollide(Point point,Ship s){
+	public boolean isShipCollide(Point point,Bateau s){
 		int sLength = s.getLength();
 		int rowStart, colStart, rowEnd, colEnd;
 		
-		Cell startCell = (Cell) this.getComponentAt(point);
+		Case startCell = (Case) this.getComponentAt(point);
 		rowStart = startCell.getRow();
 		colStart = startCell.getColumn();
 		rowEnd = startCell.getRow();
@@ -204,13 +204,13 @@ public class GridBoard extends JPanel{
 	 * @param safeCell the previous safe position.
 	 * @return the point calculated safe position for the ship.
 	 */
-	public Point matchShipCellAtPoint(Point point,Ship s,Point safeCell) {
+	public Point matchShipCellAtPoint(Point point,Bateau s,Point safeCell) {
 		int sLength = s.getLength();
 		int rowStart, colStart, rowEnd, colEnd;
 		
 		//Cell[] matchCells = new Cell[sLength];
 		
-		Cell startCell = (Cell) this.getComponentAt(point);
+		Case startCell = (Case) this.getComponentAt(point);
 		rowStart = startCell.getRow();
 		colStart = startCell.getColumn();
 		rowEnd = startCell.getRow();
@@ -320,10 +320,10 @@ public class GridBoard extends JPanel{
 		
 		if(flags[row][column][0] > 0){
 		        System.out.println("Ship id hit:" + flags[row][column][0]);	
-				cells[row][column].setShipHit();
+				cells[row][column].setTouche();
 				gameBoard.setShipHitById(flags[row][column][0]);
 		}
-		cells[row][column].setMissedHit();
+		cells[row][column].setManque();
 		return flags[row][column][0];
 	}
 	
@@ -340,12 +340,12 @@ public class GridBoard extends JPanel{
 		if(flags[row][column][0] > 0){
 		        System.out.println("Ship id hit:" + flags[row][column][0]);	
 
-				cells[row][column].setShipHit();
+				cells[row][column].setTouche();
 				//gameBoard.setShipHitById(flags[row][column][0]);
 				gameBoard.onMouseHitAtCell(row, column, true, gameBoard.setShipHitById(flags[row][column][0]));
 				return;
 		}
-		cells[row][column].setMissedHit();
+		cells[row][column].setManque();
 		gameBoard.onMouseHitAtCell(row, column, false, false);
 		
 	}
