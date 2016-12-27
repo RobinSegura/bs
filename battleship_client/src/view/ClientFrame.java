@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import connector.Connexion;
 import connector.Message;
 import connector.ServerReader;
 import engine.PlayerStatus;
@@ -21,76 +22,31 @@ import engine.PlayerStatus;
  * 
  * This class create client's window containing two grids with five ships.
  */
-public class ClientFrame extends JFrame{
+public class ClientFrame extends JFrame implements Runnable {
 	
-	/** The client socket. */
-	private Socket clientSocket;
-	
-	/** The reader thread. */
-	private ServerReader reader;
-	
-	/** The writer stream. */
-	private ObjectOutputStream writer;
-	
-	/** The player status. */
+	private Socket cSocket;
+	private Connexion cnx;
+	private ServerReader sReader;
+	private ObjectOutputStream out;
 	private PlayerStatus status;
-	
-	/** The player board. */
 	private GameBoard player;
-	
-	/** The opponent board. */
 	private GameBoard opponent;
-	
-	/** The is connected flag. */
 	private boolean isConnected;
-	
-	/** The player win flag. */
 	private boolean playerWin;
-	
-	/** The game over flag. */
 	private boolean gameOver;
-	
-	/** The player. */
 	private JLabel lblPlayer;
-	
-	/** The opponent. */
 	private JLabel lblOpponent;
-	
-	/** The player's ship left. */
 	private JLabel lblShipLeft;
-	
-	/** The opponent's ship left. */
 	private JLabel lblShipLeft_1;	
-	
-	/** The player status. */
 	private JLabel lblStatus;
-	
-	/** The opponent status. */
 	private JLabel lblStatus_1;	
-	
-	/** The player message. */
-	private JLabel lblMessage;
-	
-	/** The opponent message. */
+	private JLabel infoText;
 	private JLabel lblMessage_1;	
-	
-	/** The connect button. */
-	private JButton btnConnect;
-	
-	/** The play button. */
 	private JButton btnPlay;
-	
-	/** The new game button. */
 	private JButton btnNewGame;
 	
-	
-	/**
-	 * Create a new client frame.
-	 *
-	 * @param title title of the window
-	 */
-	public ClientFrame(String title){
-		super(title);
+	public ClientFrame(Socket s, ObjectInputStream in, ObjectOutputStream out, Connexion cnx){
+		super("BattleShip");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(null);
@@ -98,16 +54,13 @@ public class ClientFrame extends JFrame{
 		isConnected = false;
 		gameOver = false;
 		playerWin = false;
+		this.cnx = cnx;
 		
 		player = new GameBoard(this);
 		player.setBackground(Color.LIGHT_GRAY);
 		player.setBounds(10, 150, 300, 300);
 		getContentPane().add(player);
-		
-		/*
-		 * Opponent's ships are invisible
-		 * only show destroyed ship
-		 */
+
 		opponent = new GameBoard(this);
 		opponent.setBackground(Color.LIGHT_GRAY);
 		opponent.setBounds(320, 150, 300, 300);
@@ -139,23 +92,13 @@ public class ClientFrame extends JFrame{
 		lblMessage_1.setBounds(320, 86, 300, 14);
 		getContentPane().add(lblMessage_1);
 		
-		lblMessage = new JLabel("Message");
-		lblMessage.setBounds(10, 86, 300, 14);
-		getContentPane().add(lblMessage);
+		infoText = new JLabel("Message");
+		infoText.setBounds(10, 86, 300, 14);
+		getContentPane().add(infoText);
 		
 		lblStatus_1 = new JLabel("Status");
 		lblStatus_1.setBounds(320, 61, 300, 14);
 		getContentPane().add(lblStatus_1);
-		
-		btnConnect = new JButton("Connect");
-		btnConnect.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				connectToServer();
-			}
-		});
-		btnConnect.setBounds(10, 111, 89, 23);
-		getContentPane().add(btnConnect);
 		
 		btnPlay = new JButton("Play");
 		btnPlay.addMouseListener(new MouseAdapter() {
@@ -188,6 +131,22 @@ public class ClientFrame extends JFrame{
 		lblShipLeft.setText("Ship Destroyed: " + player.getShipDestroyed());
 		lblShipLeft_1.setText("Ship Destroyed: " + opponent.getShipDestroyed());
 		
+		infoText.setText("trying to connect\n");
+		cSocket = s;
+		
+		if(cSocket.isConnected()){
+			this.out = out;
+			this.sReader = ServerReader.getInstance(in);
+			sReader.setClfrm(this);
+			sReader.start();
+			
+			player.enableMouseEvents(1);
+			btnPlay.setEnabled(true);
+			status = PlayerStatus.CONNECTED;
+			startGame();
+		}else{
+	        infoText.setText("Porblème réseau, essayez de redémarer\n");
+		}
 	}
 	
 	/**
@@ -226,28 +185,6 @@ public class ClientFrame extends JFrame{
 		return player.getMyShipLocation();
 	}
 	
-	/**
-	 * Connect to server socket.
-	 */
-	public void connectToServer(){
-		//Connect Button Clicked
-		
-		//start a socket thread, reader and writer thread
-		//Notify user connection status
-		lblMessage.setText("trying to connect\n");
-		if(setUpNetworking()) {
-			lblMessage.setText("Set Ships and start game\n");
-			player.enableMouseEvents(1);
-			btnPlay.setEnabled(true);
-			btnConnect.setEnabled(false);
-			status = PlayerStatus.CONNECTED;
-			lblStatus.setText("Connected");
-		}
-	}
-	
-	/**
-	 * Send player's ship position and layout and start new game.
-	 */
 	public void startGame(){
 		//Start Button Clicked
 
@@ -263,13 +200,10 @@ public class ClientFrame extends JFrame{
 		
 		status = PlayerStatus.READY;
 		lblStatus.setText("Ready");
-		lblMessage.setText("Waiting for opponent");
+		infoText.setText("Waiting for opponent");
 		btnPlay.setEnabled(false);
 	}
-	
-	/**
-	 * Reset Games and game boards.
-	 */
+
 	public void newGame(){
 		
 		player.resetGameBoard();
@@ -282,7 +216,7 @@ public class ClientFrame extends JFrame{
 		btnPlay.setEnabled(true);
 		btnNewGame.setEnabled(false);
 		
-		lblMessage.setText("Set Ships and start game\n");
+		infoText.setText("Set Ships and start game\n");
 		lblStatus.setText("Conneted");
 		lblShipLeft.setText("Ship Destroyed: " + player.getShipDestroyed());
 		lblShipLeft_1.setText("Ship Destroyed: " + opponent.getShipDestroyed());
@@ -294,35 +228,6 @@ public class ClientFrame extends JFrame{
 		
 		repaint();
 	}
-
-    /**
-     * Create socket and connect to server.
-     *
-     * @return true, if successful
-     */
-    private boolean setUpNetworking() {
-        try {
-        	clientSocket = new Socket(InetAddress.getLocalHost(), 6020);
-        	//clientSocket = new Socket("192.168.0.18", 6020);
-        	
-        	if(clientSocket.isConnected()){
-	            writer = new ObjectOutputStream(clientSocket.getOutputStream());
-	            writer.flush();
-	            
-	            reader = ServerReader.getInstance(this, new ObjectInputStream(clientSocket.getInputStream()));
-	            reader.start();
-	            
-	            return true;
-        	}
-        }
-        catch(IOException ex)
-        {
-            //ex.printStackTrace();
-        	lblMessage.setText("Server is not running\n");
-        }
-        lblMessage.setText("networking could not established\n");
-        return false;
-    }
     
 	/**
 	 * Game over status.
@@ -359,9 +264,14 @@ public class ClientFrame extends JFrame{
 		case NOT_CONNECTED:
 			lblStatus_1.setText("Not Connected");
 			break;
+		case WAITINGOP:
+			lblStatus_1.setText("En attente d'adversaire");
+			btnPlay.setEnabled(false);
 		case CONNECTED:
 			lblStatus_1.setText("Connected");
-			break;			
+			btnPlay.setEnabled(true);
+			cnx.dispose();
+			break;
 		case READY:
 			//Set oponent ships
 			lblStatus_1.setText("Ready");
@@ -388,7 +298,7 @@ public class ClientFrame extends JFrame{
 			
 			lblShipLeft.setText("Ship Destroyed: " + player.getShipDestroyed());
 			lblShipLeft_1.setText("Ship Destroyed: " + opponent.getShipDestroyed());
-			lblMessage.setText("Your turn");
+			infoText.setText("Your turn");
 			lblMessage_1.setText("Waiting for your turn");
 			
 			break;
@@ -408,7 +318,7 @@ public class ClientFrame extends JFrame{
 			lblShipLeft.setText("Ship Destroyed: " + player.getShipDestroyed());
 			lblShipLeft_1.setText("Ship Destroyed: " + opponent.getShipDestroyed());
 			
-			lblMessage.setText("Waiting for opponent's turn");
+			infoText.setText("Waiting for opponent's turn");
 			lblMessage_1.setText("Opponent's turn");
 			
 			break;
@@ -421,23 +331,15 @@ public class ClientFrame extends JFrame{
 			lblStatus_1.setText("Game Over");
 			
 			if(srMsg.isFlag()){
-				lblMessage.setText("Player won!");
+				infoText.setText("You won!");
 				lblMessage_1.setText("Opponent lost");
 			}else{
 				lblMessage_1.setText("Opponent won!");
-				lblMessage.setText("Player lost");				
+				infoText.setText("You lost");				
 			}
 		}
 	}
-
-	/**
-	 * Opponent move action.
-	 *
-	 * @param row the row of the move.
-	 * @param column the column of the move.
-	 * @param flag If any ship hit.
-	 * @param sdflag If ship destroyed.
-	 */
+	
 	public void opponentMouseHit(int row, int column, boolean flag, boolean sdflag){
 		Message msg = new Message();
 		msg.setMessageType(PlayerStatus.TURN);
@@ -445,8 +347,6 @@ public class ClientFrame extends JFrame{
 		msg.setColumn(column);
 		msg.setFlag(flag);
 		msg.setShipDestroyed(sdflag);
-		//System.out.println("Messgae sent " + row + ":" + column + ":" + flag);
-		
 		opponent.disableMouseEvents(2);
 		sendMessage(msg);
 	}
@@ -458,9 +358,9 @@ public class ClientFrame extends JFrame{
 	 */
 	private void sendMessage(Message msg){
 		try {
-			writer.writeObject(msg);
+			out.writeObject(msg);
 		} catch (IOException e) {
-			lblStatus.setText("Conneection Error");
+			lblStatus.setText("Connection interrompue");
 		}
 	}
 	
@@ -476,30 +376,17 @@ public class ClientFrame extends JFrame{
 		lblStatus_1.setText("Disconnected");
 		
 		newGame();
-		clientSocket = null;
+		cSocket = null;
 		btnPlay.setEnabled(false);
-		btnConnect.setEnabled(true);
 		//stop and reset game
 		//reset socket
 	}		
-		
-	/**
-	 * The main method to start the client program.
-	 *
-	 * @param args the command arguments.
-	 */
-	public static void main(String[] args) {
-
-		ClientFrame frame = new ClientFrame("BattleShip Client");
-		// Display the frame
-		frame.setSize(640, 500); //300,300
-		frame.setResizable(false);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-
+	
+	@Override
+	public void run() {
+		setSize(640, 500); //300,300
+		setResizable(false);
+		setLocationRelativeTo(null);
+		setVisible(true);
 	}
-
-
-
-
 }

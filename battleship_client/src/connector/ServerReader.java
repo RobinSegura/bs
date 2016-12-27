@@ -28,11 +28,11 @@ public class ServerReader extends Thread {
 	 * @param reader Object input stream of the server socket.
 	 * @return static instance of ServerReader.
 	 */
-	public static ServerReader getInstance(ClientFrame clfrm, ObjectInputStream reader) {
+	public static ServerReader getInstance(ObjectInputStream reader) {
         if (instance == null) {
                 synchronized (ServerReader .class){
                         if (instance == null) {
-                                instance = new ServerReader(clfrm,reader);
+                                instance = new ServerReader(reader);
                         }
               }
         }
@@ -45,13 +45,15 @@ public class ServerReader extends Thread {
 	 * @param clfrm parent container.
 	 * @param reader Object input stream.
 	 */
-	private ServerReader(ClientFrame clfrm, ObjectInputStream reader){
-		this.clfrm = clfrm;
+	private ServerReader(ObjectInputStream reader){
 		this.reader = reader;
 	}
-	
 
-    public void run() {
+    public void setClfrm(ClientFrame clfrm) {
+		this.clfrm = clfrm;
+	}
+
+	public void run() {
     	//replace with Object
         Object message;
         try {

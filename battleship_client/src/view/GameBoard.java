@@ -102,81 +102,46 @@ public class GameBoard extends JLayeredPane{
 		return new Rectangle(cord.x + 2, cord.y + 2, width-4, height-4);
 	}
 	
-	
-	/**
-	 * The Class to handle Mouse events.
-	 */
 	private class MyMouseAdapter extends MouseAdapter {
-		
-		/** The gbm. */
 		private GameBoard gbm;
-        
-        /** The drag label width div2. */
         private int dragLabelWidthDiv2;
-        
-        /** The drag label height div2. */
         private int dragLabelHeightDiv2;
-        
-        /** The clicked ship. */
         private Ship clickedShip = null;
-        
-        /** The drop cell. */
         private Point dropCell;
-        
-        /** The safe cell. */
         private Point safeCell;
-        
-        /**
-         * Instantiates a new my mouse adapter.
-         *
-         * @param gb the gb
-         */
+
         public MyMouseAdapter(GameBoard gb){
         	gbm = gb;
         	safeCell = new Point();
         }
-
-        /* (non-Javadoc)
-         * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
-         */
+        
         public void mouseClicked(MouseEvent me) {
         	if(shipBoard.getComponentAt(me.getPoint()) instanceof Ship)
         	{
 	        	clickedShip = (Ship) shipBoard.getComponentAt(me.getPoint());
 	        	safeCell.setLocation(clickedShip.getRow(),clickedShip.getColumn());
-	        	//safeCell.x = clickedShip.getRow();
-	        	//safeCell.y = clickedShip.getColumn();
-	        	
 	        	gridBoard.clearShipCell(clickedShip);
-	        	
 	        	clickedShip.setHorizontal(!clickedShip.isHorizontal());
-	        	//if ship collide then dont change orientation
-	        	if(gridBoard.isShipCollide(me.getPoint(), clickedShip)) clickedShip.setHorizontal(!clickedShip.isHorizontal());
-                
-	        	dropCell = gbm.gridBoard.matchShipCellAtPoint(me.getPoint(),clickedShip,safeCell);
+	        	
+	        	if(gridBoard.isShipCollide(me.getPoint(), clickedShip)){
+	        		clickedShip.setHorizontal(!clickedShip.isHorizontal());
+	        	}
+                dropCell = gbm.gridBoard.matchShipCellAtPoint(me.getPoint(),clickedShip,safeCell);
                 
                 clickedShip.setRow(dropCell.x);
                 clickedShip.setColumn(dropCell.y);
-                
-                //gridBoard.setShipCell(clickedShip);
                 
                 clickedShip.setBounds(getShipBounds(clickedShip));
                 gridBoard.resetCellHighlight();
         	}
         }
         
-        /* (non-Javadoc)
-         * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
-         */
         public void mousePressed(MouseEvent me) {
         	
         	if(shipBoard.getComponentAt(me.getPoint()) instanceof Ship)
         	{
 	        	clickedShip = (Ship) shipBoard.getComponentAt(me.getPoint());
 	        	safeCell.setLocation(clickedShip.getRow(),clickedShip.getColumn());
-	        	//safeCell.x = clickedShip.getRow();
-	        	//safeCell.y = clickedShip.getColumn();
-
 	        	
                 dragLabelWidthDiv2 = 15 - 4;
                 dragLabelHeightDiv2 = 15- 4;
@@ -192,9 +157,6 @@ public class GameBoard extends JLayeredPane{
         	}
         }
 
-        /* (non-Javadoc)
-         * @see java.awt.event.MouseAdapter#mouseDragged(java.awt.event.MouseEvent)
-         */
         public void mouseDragged(MouseEvent me) {
             if (clickedShip == null) {
                 return;
@@ -207,7 +169,7 @@ public class GameBoard extends JLayeredPane{
             
             clickedShip.setLocation(x, y);
             
-            repaint(); //shipboard repaint
+            repaint();
             
             
             dropCell = gbm.gridBoard.matchShipCellAtPoint(me.getPoint(),clickedShip,safeCell);
@@ -274,91 +236,41 @@ public class GameBoard extends JLayeredPane{
 		shipBoard.hideAllShip();
 	}
 	
-	
-	/**
-	 * Sets the opponent ship position.
-	 *
-	 * @param flags array of the opponent ship position.
-	 */
 	public void setOpponentShipPosition(int[][][] flags){
 		gridBoard.setOpponentShipPosition(flags);
 	}
 	
-	/**
-	 * Gets the my ship position.
-	 *
-	 * @return player's ship position.
-	 */
 	public int[][][] getMyShipPosition(){
 		return gridBoard.getMyShipPosition();
 	}
 	
-	/**
-	 * Sets the opponent ship location.
-	 *
-	 * @param shipLocation the opponent's ship layout.
-	 */
 	public void setOpponentShipLocation(int[][] shipLocation){
 		shipBoard.setOpponentShipLocation(shipLocation);
 		repaint();
 	}
 	
-	/**
-	 * Gets the my ship location.
-	 *
-	 * @return the player's layout.
-	 */
 	public int[][] getMyShipLocation(){
 		return shipBoard.getMyShipLocation();
 	}
 	
-	/**
-	 * Assign the ship hit of specified id.
-	 *
-	 * @param shipId id of the ship.
-	 * @return true, if ship destroyed.
-	 */
 	public boolean setShipHitById(int shipId){
 		if(shipBoard.setShipHitById(shipId)){
 			System.out.println("Ship id:" + shipId + " Destroyed.");
 			shipDestroyed++;
-//			if(shipDestroyed == 5){
-//				cframe.gameOverStatus(true);
-//				System.out.println("Player Won!!");
-//			}
 			shipBoard.showShip(shipId);
 			return true;
 		}
 		return false;
 	}
 
-	/**
-	 * Sets opponent's mouse hit at specified cell position.
-	 *
-	 * @param row the row of the cell
-	 * @param column the column of the cell
-	 */
 	public void setHitAtCell(int row,int column){
 		gridBoard.setHitAtCell(row, column);
 	}
 
-	/**
-	 * Sets player's mouse hit at cell position.
-	 *
-	 * @param row the row of the cell.
-	 * @param column the column of the cell.
-	 * @param hit if any ship hit.
-	 * @param sdst if any ship destroyed. 
-	 */
 	public void onMouseHitAtCell(int row, int column, boolean hit, boolean sdst){
 		cframe.opponentMouseHit(row,column,hit,sdst);
 	}
 	
- 	/**
-	  * Toggle transparent layer on game board.  
-	  *
-	  * @param f whether to display or not.
-	  */
 	 public void fade(boolean f){
 		topRect = f;
 		repaint();
@@ -375,22 +287,13 @@ public class GameBoard extends JLayeredPane{
 		}
 	}
 
-	
-	/**
-	 * Reset current board.
-	 */
 	public void resetGameBoard() {
 		gridBoard.resetGridBoard();
 		gridBoard.resetCellHighlight();
 		shipBoard.resetShipBoard();
 		shipDestroyed = 0;
 	}
-	
-	/**
-	 * Gets the ship destroyed in current game board.
-	 *
-	 * @return number of ship destroyed.
-	 */
+
 	public int getShipDestroyed(){
 		return shipDestroyed;
 	}
