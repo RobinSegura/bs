@@ -1,13 +1,13 @@
 package connector;
 
 import java.io.Serializable;
-import engine.PlayerStatus;
+import engine.Statut;
 
 public class Communication implements Serializable {
 
 	private static final long serialVersionUID = 1L;		
 	private int sender;
-	private PlayerStatus messageType;
+	private Statut messageType;
 	private int[][][] shipPosition;
 	private int[][] shipLocation;
 	private int row;
@@ -23,11 +23,11 @@ public class Communication implements Serializable {
 		this.sender = sender;
 	}
 	
-	public PlayerStatus getMessageType() {
+	public Statut getMessageType() {
 		return messageType;
 	}
 
-	public void setMessageType(PlayerStatus messageType) {
+	public void setMessageType(Statut messageType) {
 		this.messageType = messageType;
 	}
 

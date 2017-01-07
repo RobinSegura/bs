@@ -6,16 +6,11 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Scanner;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import com.sun.javafx.font.Disposer;
-
 import connector.Tester;
 
 public class Main {
@@ -24,8 +19,8 @@ public class Main {
 		frame.setLayout(null);
 		frame.setSize(360, 120);
 		frame.setResizable(true);
-		JPanel panel = new JPanel(); // Panel
-		FlowLayout fl = new FlowLayout(FlowLayout.CENTER); // layoutManager
+		JPanel panel = new JPanel();
+		FlowLayout fl = new FlowLayout(FlowLayout.CENTER);
 		panel.setLayout(fl);
 		JLabel label = new JLabel("adresse serveur: ");
 		JLabel sep = new JLabel(":");

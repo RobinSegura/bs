@@ -7,13 +7,12 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 
-
-/**
- * The Class Cell.
- *  * Class to create cell inside grid of game board.
- */
 public class Case extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int row;
     private int column;
 	private int isMouseOn;
@@ -70,17 +69,17 @@ public class Case extends JPanel {
 
       if(shipHit > 0){
     	  if(shipHit==1){
-    	      g.setColor(Color.DARK_GRAY);
+    	      g.setColor(Color.BLACK);
     	      g.fillRect(0, 0, getWidth(), getHeight());
           }else if(shipHit==2){
-              g.setColor(Color.red.brighter());
+              g.setColor(Color.RED.brighter());
               g.fillRect(0, 0, getWidth(), getHeight());    	  
           }
       }else if(isMouseOn==1){
 	      g.setColor(Color.ORANGE);
 	      g.fillRect(0, 0, getWidth(), getHeight());
       }else if(isMouseOn==0){
-          g.setColor(Color.lightGray);
+          g.setColor(Color.LIGHT_GRAY);
           g.fillRect(0, 0, getWidth(), getHeight());    	  
       }
     }
@@ -98,7 +97,6 @@ public class Case extends JPanel {
 	private class ClickListener extends MouseAdapter {
 
     	public void mouseClicked(MouseEvent e) {
-	    	//System.out.println(row + " : " + column);
 	    	if(shipHit > 0)return;
 	    	shipHit = 1;
 	    	gridBoard.onMouseHitAtCell(row,column);	    	

@@ -12,54 +12,26 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 import java.awt.Graphics2D;
 
-
-
-/**
- * The Class GameBoard. Made of grid of cells and ship panels.
- */
 public class Tableau extends JLayeredPane{
-	
-    /** The Constant WIDTH of the board. */
-    public static final int WIDTH = 300;
-    
-    /** The Constant HEIGHT of the board */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public static final int WIDTH = 300;
     public static final int HEIGHT = 300;
-    
-    /** The Constant board size. */
     private static final Dimension PANE_SIZE = new Dimension(WIDTH, HEIGHT);
-    
-    /** The parent window frame. */
     private GUI cframe;
-    
-	/** The cell grid board. */
 	private Grille gridBoard;
-	
-	/** The ship layout board. */
 	private Flotte shipBoard;
-	
-	/** The transparent layer flag. */
 	private boolean topRect;
-	
-	/** The ship destroyed counter. */
 	private int shipDestroyed;
-	
-	/** The my mouse adapter. */
 	MyMouseAdapter myMouseAdapter;
 
-	/**
-	 * Instantiates a new game board.
-	 *
-	 * @param cf the parent window.
-	 */
 	public Tableau(GUI cf){
 		cframe = cf;
 		
-		//GridBoard
 			gridBoard = new Grille(this);
 			gridBoard.setSize(PANE_SIZE);
-			//gridBoard.setBackground(Color.blue.darker());
-		
-		//ShipBoard
 			shipBoard = new Flotte(this);
 			shipBoard.setSize(PANE_SIZE);
 			shipBoard.setOpaque(false);
@@ -69,21 +41,9 @@ public class Tableau extends JLayeredPane{
         add(shipBoard,JLayeredPane.PALETTE_LAYER);
         
         myMouseAdapter = new MyMouseAdapter(this);
-        //addMouseListener(myMouseAdapter);
-        //addMouseMotionListener(myMouseAdapter);
-		
 	}
 	
-	
-	/**
-	 * Gets the ship bounds.
-	 *
-	 * @param s ship object
-	 * @return calculated ship bounds
-	 */
 	public Rectangle getShipBounds(Bateau s) {
-		//return position and width, height of ship lable to be draw.
-		
 		int width = 0,height = 0;
 		Point cord = new Point(30 * s.getColumn(),30 * s.getRow());
 		
@@ -96,8 +56,7 @@ public class Tableau extends JLayeredPane{
 			width = 30;
 		}
 		
-		//set Flags after ship has fixed position and ready to draw over these cells
-		gridBoard.setShipOccupiedCellFlag(s); //set ship grid flags
+		gridBoard.setShipOccupiedCellFlag(s);
 		
 		return new Rectangle(cord.x + 2, cord.y + 2, width-4, height-4);
 	}
@@ -176,9 +135,6 @@ public class Tableau extends JLayeredPane{
             safeCell = dropCell;
         }
 
-        /* (non-Javadoc)
-         * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
-         */
         public void mouseReleased(MouseEvent me) {
             
         	if (clickedShip == null) {
@@ -197,11 +153,6 @@ public class Tableau extends JLayeredPane{
         }
     }
 
-	/**
-	 * Enable mouse events.
-	 *
-	 * @param sender Id of the board.
-	 */
 	public void enableMouseEvents(int sender){
         if(sender == 1){
 			this.addMouseListener(myMouseAdapter);
@@ -213,11 +164,6 @@ public class Tableau extends JLayeredPane{
         fade(false);
 	}
 	
-	/**
-	 * Disable mouse events.
-	 *
-	 * @param sender Id of the board.
-	 */
 	public void disableMouseEvents(int sender){
 		if(sender == 1){
 			this.removeMouseListener(myMouseAdapter);
@@ -229,9 +175,6 @@ public class Tableau extends JLayeredPane{
 		fade(true);
 	}
 	
-	/**
-	 * Hide all ship.
-	 */
 	public void hideAllShip(){
 		shipBoard.hideAllShip();
 	}
@@ -297,6 +240,4 @@ public class Tableau extends JLayeredPane{
 	public int getShipDestroyed(){
 		return shipDestroyed;
 	}
-	
-
 }

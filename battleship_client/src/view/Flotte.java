@@ -7,8 +7,11 @@ import javax.swing.JPanel;
 
 public class Flotte extends JPanel{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Tableau tableau;
-
 	private Bateau[] flotte;
 	
 	public Flotte(Tableau tab){
