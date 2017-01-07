@@ -1,7 +1,8 @@
 package connector;
 
 import java.io.*;
-import view.GUI;
+
+import gui.GUI;
 
 public class ServerReader extends Thread {
 	private static volatile ServerReader instance = null;

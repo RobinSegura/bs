@@ -5,7 +5,9 @@ import java.net.*;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import view.GUI;
+
+import gui.GUI;
+
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.*;

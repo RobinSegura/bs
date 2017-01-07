@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
